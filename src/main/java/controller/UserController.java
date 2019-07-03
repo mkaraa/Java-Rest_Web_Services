@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import exceptions.UserSeriousException;
 import model.UserRest;
 import modelResponse.UpdateUserDetailsRequest;
 import modelResponse.UserDetailsRequestModel;
+import userserviceimpl.UserServiceImpl;
 
 @CrossOrigin
 @RestController
@@ -51,6 +53,8 @@ public class UserController {
 
 	public ResponseEntity<UserRest> getUser(@PathVariable String userId) {
 
+		if(true) throw new UserSeriousException("A serious exception is thrown");
+		
 		if(users.containsKey(userId)) {
 			return new ResponseEntity<UserRest>(users.get(userId),HttpStatus.OK);  
 		}else {
@@ -71,17 +75,8 @@ public class UserController {
 			MediaType.APPLICATION_JSON_VALUE
 		})
 	public ResponseEntity<UserRest> createUser(@Valid @RequestBody UserDetailsRequestModel userDetails) {
-		UserRest returnValue = new UserRest();
-		returnValue.setEmail(userDetails.getEmail());
-		returnValue.setFirstName(userDetails.getFirstName());
-		returnValue.setLastName(userDetails.getLastName());
 		
-		String userId = UUID.randomUUID().toString();
-		returnValue.setUserId(userId);
-		
-		if(users == null) users = new HashMap<String, UserRest>();
-		users.put(userId, returnValue);
-		
+		UserRest returnValue = new UserServiceImpl().createUser(userDetails);
 		return new ResponseEntity<UserRest>(returnValue, HttpStatus.OK);	
 	}
 	
